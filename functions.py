@@ -27,7 +27,7 @@ def extract_text_by_page(uploaded_file):
 
 
 def extract_section(text, section_name):
-    pattern = rf"{section_name}(.*?)(Date of Survey|$)"
+    pattern = rf"{section_name}(.*?)(\d+\)\s+[A-Z]|$)"
 
     match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
 
@@ -53,13 +53,13 @@ def extract_key_values(section_text):
 def extract_fields(pages_text):
     results = {}
 
-    for page in pages_text:
-        text = page["raw_text"]
+    full_text = "\n".join([p["raw_text"] for p in pages_text])
 
-        loss_section = extract_section(text, "Loss Particulars")
+    # extract section from FULL text
+    loss_section = extract_section(full_text, "Loss Particulars")
 
-        if loss_section:
-            loss_data = extract_key_values(loss_section)
-            results["loss_particulars"] = loss_data
+    if loss_section:
+        loss_data = extract_key_values(loss_section)
+        results["loss_particulars"] = loss_data
 
     return results
